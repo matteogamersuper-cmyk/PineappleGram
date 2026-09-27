@@ -57,7 +57,7 @@ jobs:
           tar -czf PineappleGram-${{ matrix.os }}.tar.gz PineappleGram/
 
       - name: Rilascia automaticamente su GitHub
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: auto-release-${{ github.run_number }}
           name: PineappleGram Build #${{ github.run_number }}
