@@ -1,0 +1,5 @@
+nicegui
+pywebview
+telethon
+python-dotenv
+pyinstaller

@@ -3,10 +3,10 @@ name: Auto Build and Release
 on:
   push:
     branches:
-      - master  # Si attiva automaticamente a ogni push sul ramo master
+      - master
 
 permissions:
-  contents: write  # Permesso fondamentale per creare tag e release automatiche
+  contents: write
 
 jobs:
   build:
@@ -33,12 +33,12 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          cache: 'pip'
+          # Rimosso il parametro 'cache: pip' che causava l'errore sui file mancanti
 
       - name: Installa le dipendenze
         run: |
           python -m pip install --upgrade pip
-          pip install pyinstaller nicegui pywebview telethon python-dotenv
+          pip install -r requirements.txt
 
       - name: Compila con PyInstaller
         run: |
