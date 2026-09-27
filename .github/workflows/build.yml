@@ -12,7 +12,7 @@ jobs:
   build:
     name: Build for ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 15 # Impedisce che il job rimanga bloccato all'infinito
+    timeout-minutes: 15
 
     strategy:
       matrix:
