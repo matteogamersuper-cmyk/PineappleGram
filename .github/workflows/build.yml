@@ -1,0 +1,67 @@
+name: Auto Build and Release
+
+on:
+  push:
+    branches:
+      - master  # Si attiva automaticamente a ogni push sul ramo master
+
+permissions:
+  contents: write  # Permesso fondamentale per creare tag e release automatiche
+
+jobs:
+  build:
+    name: Build for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            pyinstaller_args: --noconsole --onefile --name PineappleGram
+          - os: macos-latest
+            pyinstaller_args: --noconsole --onedir --name PineappleGram
+          - os: ubuntu-latest
+            pyinstaller_args: --noconsole --onedir --name PineappleGram
+
+    steps:
+      - name: Checkout del codice
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configura Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Installa le dipendenze
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller nicegui pywebview telethon python-dotenv
+
+      - name: Compila con PyInstaller
+        run: |
+          pyinstaller ${{ matrix.pyinstaller_args }} app.py
+
+      - name: Prepara gli artefatti (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          cd dist
+          powershell Compress-Archive -Path PineappleGram.exe -DestinationPath PineappleGram-Windows.zip
+
+      - name: Prepara gli artefatti (macOS / Linux)
+        if: matrix.os != 'windows-latest'
+        run: |
+          cd dist
+          tar -czf PineappleGram-${{ matrix.os }}.tar.gz PineappleGram/
+
+      - name: Rilascia automaticamente su GitHub
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: auto-release-${{ github.run_number }}
+          name: PineappleGram Build #${{ github.run_number }}
+          files: |
+            dist/*.zip
+            dist/*.tar.gz
+          generate_release_notes: true
