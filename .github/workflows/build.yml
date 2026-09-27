@@ -12,6 +12,7 @@ jobs:
   build:
     name: Build for ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 15 # Impedisce che il job rimanga bloccato all'infinito
 
     strategy:
       matrix:
@@ -33,16 +34,15 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          # Rimosso il parametro 'cache: pip' che causava l'errore sui file mancanti
 
       - name: Installa le dipendenze
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install --prefer-binary -r requirements.txt
 
       - name: Compila con PyInstaller
         run: |
-          pyinstaller ${{ matrix.pyinstaller_args }} app.py
+          pyinstaller ${{ matrix.pyinstaller_args }} src/app.py
 
       - name: Prepara gli artefatti (Windows)
         if: matrix.os == 'windows-latest'
